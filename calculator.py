@@ -17,6 +17,8 @@ class Calculator:
         root.iconbitmap('icon/calc.ico')
         self.window_center(root, 640, 305)
         root.resizable(0, 0)
+        root.attributes('-alpha', 0.9)      # 设置不透明度
+        root.attributes('-topmost', 1)      # 窗口顶置
 
         self.expression = Entry(root, justify='right', font=('宋体', 22), bd=2)
         # 清除键和删除键
