@@ -15,7 +15,7 @@ class Calculator:
         root = Tk()
         root.title('计算器')
         root.iconbitmap('icon/calc.ico')
-        self.window_center(root, 760, 385)
+        self.window_center(root, 763, 380)
         root.resizable(0, 0)
         root.attributes('-alpha', 0.92)      # 设置不透明度
         root.attributes('-topmost', 1)      # 窗口顶置
@@ -23,12 +23,11 @@ class Calculator:
         self.exp = StringVar()
         self.exp.set('0')
 
-        frame = Frame(root)
-        frame.grid(row=0, column=0, pady=10, padx=5, columnspan=5, sticky=W + E)
-
-        self.contentLabel = Label(frame, textvariable=self.exp, font=('Arial', 22), anchor=SE,
+        self.contentLabel = Label(root, textvariable=self.exp, font=('Arial', 22), anchor=SE,
                                   height=2, relief=RAISED, bd=2, bg='#E6E6FA', justify=RIGHT,
                                   width=44, wraplength=750)
+        self.contentLabel.grid(row=0, column=0, pady=10, padx=5, columnspan=5, sticky=W + E)
+
         # 清除键和删除键
         btnClear = Button(root, text='C', command=self.clear)
         btnDel = Button(root, text='DEL', command=self.backspace)
@@ -59,9 +58,6 @@ class Calculator:
 
         for btn in btns:
             self.add_configures(btn)
-
-
-        self.contentLabel.pack()
 
         btn7.grid(row=1, column=0, padx=5, pady=5)
         btn8.grid(row=1, column=1, padx=5, pady=5)
@@ -113,6 +109,8 @@ class Calculator:
             content = ''
         if content == 'Error':
             content = ''
+        if char == '.' and content == '':
+            content = '0'
         self.exp.set(content + char)
 
     def clear(self):
