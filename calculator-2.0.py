@@ -15,7 +15,7 @@ class Calculator:
         root = Tk()
         root.title('计算器')
         root.iconbitmap('icon/calc.ico')
-        self.window_center(root, 760, 380)
+        self.window_center(root, 760, 385)
         root.resizable(0, 0)
         root.attributes('-alpha', 0.92)      # 设置不透明度
         root.attributes('-topmost', 1)      # 窗口顶置
@@ -23,8 +23,12 @@ class Calculator:
         self.exp = StringVar()
         self.exp.set('0')
 
-        self.contentLabel = Label(root, textvariable=self.exp, font=('Arial', 22), anchor=SE,
-                                  height=2, relief=RAISED, bd=2, bg='#E6E6FA', justify=RIGHT)
+        frame = Frame(root)
+        frame.grid(row=0, column=0, pady=10, padx=5, columnspan=5, sticky=W + E)
+
+        self.contentLabel = Label(frame, textvariable=self.exp, font=('Arial', 22), anchor=SE,
+                                  height=2, relief=RAISED, bd=2, bg='#E6E6FA', justify=RIGHT,
+                                  width=44, wraplength=750)
         # 清除键和删除键
         btnClear = Button(root, text='C', command=self.clear)
         btnDel = Button(root, text='DEL', command=self.backspace)
@@ -44,18 +48,20 @@ class Calculator:
         btn7 = Button(root, text='7', command=lambda: self.enter('7'))
         btn8 = Button(root, text='8', command=lambda: self.enter('8'))
         btn9 = Button(root, text='9', command=lambda: self.enter('9'))
-        # . % 和 =
+        # . % ^ 和 =
         btnD = Button(root, text='.', command=lambda: self.enter('.'))
         btnPer = Button(root, text='%', command=lambda: self.enter('%'))
+        btnExp = Button(root, text='x^y', command=lambda: self.enter('^'))
         btnE = Button(root, text='=', command=self.equal, bg='#F0E68C')
 
         btns = [btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9,
-                btnD, btnP, btnDel, btnClear, btnM, btnS, btnE, btnDiv, btnPer]
+                btnD, btnP, btnDel, btnClear, btnM, btnS, btnE, btnDiv, btnPer, btnExp]
 
         for btn in btns:
             self.add_configures(btn)
 
-        self.contentLabel.grid(row=0, column=0, columnspan=5, pady=10, padx=5, sticky=W + E)
+
+        self.contentLabel.pack()
 
         btn7.grid(row=1, column=0, padx=5, pady=5)
         btn8.grid(row=1, column=1, padx=5, pady=5)
@@ -73,12 +79,13 @@ class Calculator:
         btn2.grid(row=3, column=1, padx=5, pady=5)
         btn3.grid(row=3, column=2, padx=5, pady=5)
         btnM.grid(row=3, column=3, padx=5, pady=5)
-        btnE.grid(row=3, column=4, padx=5, pady=5, rowspan=2, sticky=N+S)
+        btnExp.grid(row=3, column=4, padx=5, pady=5)
 
         btn0.grid(row=4, column=0, padx=5, pady=5)
         btnPer.grid(row=4, column=1, padx=5, pady=5)
         btnD.grid(row=4, column=2, padx=5, pady=5)
         btnDiv.grid(row=4, column=3, padx=5, pady=5)
+        btnE.grid(row=4, column=4, padx=5, pady=5)
 
         root.mainloop()
 
@@ -102,7 +109,9 @@ class Calculator:
         # 如果内容中有=号, 继续键入时只保留其结果
         if '=' in content:
             content = content.split('=')[1]
-        if content == 'Error' or content == '0':
+        if content == '\n0' or content == '0':
+            content = ''
+        if content == 'Error':
             content = ''
         self.exp.set(content + char)
 
@@ -113,18 +122,22 @@ class Calculator:
     def backspace(self):
         # 每次删除最后一个字符
         content = self.exp.get()
-        if len(content) == 1 or '=' in content:
+        if '=' in content:
+            return
+        if content == '\n0':
+            self.clear()
+        if len(content) == 1:
             self.clear()
         else:
             self.exp.set(content[:-1])
 
     def equal(self):
         content = self.exp.get()
-        if '=' in content:
+        if '=' in content or content == '0':
             return
         # 计算结果
         try:
-            result = eval(content.replace(',', ''))
+            result = eval(content.replace(',', '').replace('^', '**'))
             self.exp.set(f'{content}=\n{result:,}')
         except:
             self.clear()
